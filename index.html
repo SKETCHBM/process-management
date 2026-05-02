@@ -3,52 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工程管理 Cloud Final Edition</title>
+    <title>工程管理 Cloud & Local 完全版</title>
     <style>
-        :root { --primary: #2563eb; --bg: #f1f5f9; --danger: #ef4444; --warning: #f59e0b; --success: #10b981; }
-        body { font-family: "Helvetica Neue", Arial, sans-serif; background: var(--bg); padding: 10px; color: #1e293b; font-size: 14px; transition: 0.2s; }
+        :root { --primary: #2563eb; --bg: #f1f5f9; --danger: #ef4444; --warning: #f59e0b; --success: #10b981; --dark: #1e293b; }
+        body { font-family: "Helvetica Neue", Arial, sans-serif; background: var(--bg); padding: 10px; color: var(--dark); font-size: 14px; }
         .container { max-width: 1200px; margin: 0 auto; }
         
         /* 現場モード */
-        body.mobile-mode button { padding: 15px 25px; font-size: 16px; }
-        body.mobile-mode input, body.mobile-mode select { padding: 12px; font-size: 16px; }
-        body.mobile-mode .project-header { padding: 22px 12px; }
+        body.mobile-mode button { padding: 18px 24px; font-size: 17px; }
+        body.mobile-mode input, body.mobile-mode select { padding: 14px; font-size: 17px; }
+        body.mobile-mode .project-header { padding: 25px 15px; }
 
-        .sync-status { position: fixed; top: 10px; right: 10px; padding: 6px 12px; border-radius: 20px; font-size: 11px; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000; font-weight: bold; }
-        
-        /* ログ */
-        .log-container { background: #1e293b; color: #f1f5f9; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 11px; }
-        .log-list { max-height: 5em; overflow-y: auto; line-height: 1.4; }
-        .log-item { border-bottom: 1px solid #334155; padding: 3px 0; font-family: monospace; }
+        /* ステータス・ログ */
+        .sync-status { position: fixed; top: 10px; right: 10px; padding: 6px 14px; border-radius: 20px; font-size: 11px; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 1000; font-weight: bold; border: 1px solid #e2e8f0; }
+        .log-container { background: var(--dark); color: #f1f5f9; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 11px; }
+        .log-list { max-height: 5em; overflow-y: auto; line-height: 1.5; }
+        .log-item { border-bottom: 1px solid #334155; padding: 4px 0; font-family: monospace; }
 
-        .top-tools { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        /* 操作パネル */
+        .top-tools { background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
         .tool-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-        
-        .lock-notice { background: #fee2e2; border: 1px solid var(--danger); padding: 10px; border-radius: 8px; color: var(--danger); font-weight: bold; margin-bottom: 10px; }
+        .lock-notice { background: #fee2e2; border: 1px solid var(--danger); padding: 10px; border-radius: 8px; color: var(--danger); font-weight: bold; text-align: center; }
 
-        /* ビジュアル要素 */
-        .pri-1 { border-left: 10px solid var(--danger) !important; }
-        .pri-2 { border-left: 10px solid var(--warning) !important; }
-        .pri-3 { border-left: 10px solid var(--primary) !important; }
-        .pri-4 { border-left: 10px solid #94a3b8 !important; }
+        /* ビジュアル */
+        .pri-1 { border-left: 12px solid var(--danger) !important; }
+        .pri-2 { border-left: 12px solid var(--warning) !important; }
+        .pri-3 { border-left: 12px solid var(--primary) !important; }
         .badge-new { background: var(--danger); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; animation: blink 2s infinite; margin-right: 5px; }
         @keyframes blink { 0%, 100% {opacity: 1;} 50% {opacity: 0.5;} }
 
-        .project-header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px; border-radius: 8px; cursor: pointer; border: 1px solid #e2e8f0; position: relative; margin-bottom: 5px; }
-        .progress-outer { position: absolute; bottom: 0; left: 0; height: 5px; background: #e2e8f0; width: 100%; border-radius: 0 0 8px 8px; overflow: hidden; }
-        .progress-inner { height: 100%; background: var(--success); transition: width 0.4s ease; }
-        .progress-text { font-size: 11px; font-weight: bold; color: var(--success); margin-left: 10px; }
+        /* 案件ヘッダー・進捗バー */
+        .project-header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px; border-radius: 8px; cursor: pointer; border: 1px solid #e2e8f0; position: relative; margin-bottom: 8px; }
+        .progress-outer { position: absolute; bottom: 0; left: 0; height: 6px; background: #e2e8f0; width: 100%; border-radius: 0 0 8px 8px; overflow: hidden; }
+        .progress-inner { height: 100%; background: var(--success); transition: width 0.6s ease; }
+        .progress-text { font-size: 12px; font-weight: bold; color: var(--success); margin-left: 10px; }
         
-        .table-wrapper { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; min-width: 800px; }
-        th, td { border: 1px solid #e2e8f0; padding: 10px; background: #fff; }
+        th, td { border: 1px solid #e2e8f0; padding: 10px; background: #fff; text-align: left; }
         
-        button { cursor: pointer; background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; transition: 0.2s; }
-        button:disabled { opacity: 0.3; cursor: not-allowed !important; }
-        .btn-sub { background: #64748b; }
+        button { cursor: pointer; background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
+        .btn-auth { background: var(--dark); }
+        .btn-local { background: #64748b; font-size: 11px; padding: 5px 10px; }
         .btn-delete { background: var(--danger); }
         .btn-quick-done { background: var(--success); font-size: 12px; }
-        
         .switch-label { font-weight: bold; display: flex; align-items: center; gap: 5px; background: #e2e8f0; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; }
     </style>
 </head>
@@ -58,166 +56,173 @@
     <div id="syncStatus" class="sync-status">未接続</div>
     
     <div class="log-container">
-        <div style="font-weight:bold; margin-bottom:4px; font-size:10px; color:#94a3b8;">SYSTEM LOG / SECURITY IP RECORDING</div>
-        <div id="logList" class="log-list">認証待ち...</div>
+        <div style="font-weight:bold; margin-bottom:4px; font-size:10px; color:#94a3b8;">SYSTEM LOG / IP: <span id="ipDisplay">...</span></div>
+        <div id="logList" class="log-list">認証コードを入力してください。</div>
     </div>
 
     <div class="top-tools">
         <div class="tool-row">
-            <span><b>操作者:</b></span>
-            <input type="text" id="userName" style="width:100px" placeholder="氏名" oninput="uiLockCheck()">
-            <span><b>PASS:</b></span>
-            <input type="password" id="accessPass" style="width:100px" placeholder="パスコード" oninput="uiLockCheck()">
-            <button class="btn-sub" id="btnAuth" onclick="fetchData()">認証・データ取得</button>
+            <span>操作者:</span><input type="text" id="userName" style="width:80px" placeholder="氏名" oninput="uiLock()">
+            <span>PASS:</span><input type="password" id="accessPass" style="width:80px" placeholder="認証" oninput="uiLock()">
+            <button class="btn-auth" id="btnAuth" onclick="fetchData()">読込・認証</button>
             <label class="switch-label"><input type="checkbox" id="mobileModeToggle" onchange="toggleMobileMode()"> 現場モード</label>
+            <div style="margin-left:auto; display:flex; gap:5px;">
+                <button class="btn-local" onclick="exportLocal()">ローカル保存(JSON)</button>
+                <button class="btn-local" onclick="document.getElementById('fileInput').click()">ローカル読込</button>
+                <input type="file" id="fileInput" style="display:none" accept=".json" onchange="importLocal(event)">
+            </div>
         </div>
         
-        <div id="lockMessage" class="lock-notice">正しいパスワードを入力し「認証」ボタンを押してください</div>
+        <div id="lockMessage" class="lock-notice">認証が完了するまでクラウド機能はロックされています</div>
         
         <div class="tool-row">
-            <input type="text" id="searchInput" style="flex:2" placeholder="案件名・NO・担当で検索" oninput="render()" disabled class="auth-only">
+            <input type="text" id="searchInput" style="flex:2" placeholder="検索（案件・NO・担当）" oninput="render()" disabled class="auth-only">
             <label><input type="checkbox" id="myTaskOnly" onchange="render()" disabled class="auth-only"> 自分宛</label>
             <label><input type="checkbox" id="showArchived" onchange="render()" disabled class="auth-only"> 完了表示</label>
-            <select id="sortSelect" onchange="render()" style="width:110px" disabled class="auth-only">
+            <select id="sortSelect" onchange="render()" disabled class="auth-only">
                 <option value="date-asc">期限順</option>
                 <option value="new">新着順</option>
-                <option value="pri-asc">重要度順</option>
             </select>
         </div>
     </div>
 
     <div id="projectList"></div>
 
-    <div class="card" style="background:#fff; padding:15px; border-radius:12px; margin-top:20px; border: 1px solid #e2e8f0;">
-        <h3 style="margin-top:0; font-size:15px;">新規案件の登録</h3>
+    <div style="background:#fff; padding:15px; border-radius:12px; margin-top:20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <h3 style="margin-top:0; font-size:14px;">新規案件の登録</h3>
         <div class="tool-row">
-            <input type="text" id="newTitle" placeholder="案件名（製品名など）" style="flex:2" disabled class="auth-only">
-            <input type="text" id="newNo" placeholder="NO" style="flex:1" disabled class="auth-only">
+            <input type="text" id="newTitle" placeholder="案件名・製品名" style="flex:2" disabled class="auth-only">
+            <input type="text" id="newNo" placeholder="管理NO" style="flex:1" disabled class="auth-only">
             <button id="addProjBtn" onclick="addProject()" disabled class="auth-only">案件作成</button>
         </div>
     </div>
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbymo87fJefwPTk8pjEDM4_a5L_DmMsj9Mv5lc4iENOIgQwngECr_LpL09_ibJ32ckPF/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzetXv_6M3sAiPUz6qORvB93NhaX7sdJc8jM3OQHWtWYCld6UmqMyi1Mi4_w4CaWcGK/exec";
     let projects = [];
     let historyLogs = [];
-    let userIP = "取得中...";
+    let userIP = "Unknown";
     let isAuthenticated = false;
 
-    fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => userIP = d.ip).catch(() => userIP = "Unknown");
+    fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => {
+        userIP = d.ip; document.getElementById('ipDisplay').innerText = d.ip;
+    }).catch(()=>{});
 
-    function toggleMobileMode() {
-        document.body.classList.toggle('mobile-mode', document.getElementById('mobileModeToggle').checked);
+    function toggleMobileMode() { document.body.classList.toggle('mobile-mode', document.getElementById('mobileModeToggle').checked); }
+    function uiLock() {
+        const u = document.getElementById('userName').value.trim();
+        const p = document.getElementById('accessPass').value.trim();
+        document.getElementById('btnAuth').disabled = (u === "" || p === "");
     }
 
-    function uiLockCheck() {
-        const user = document.getElementById('userName').value.trim();
-        const pass = document.getElementById('accessPass').value.trim();
-        document.getElementById('btnAuth').disabled = (user === "" || pass === "");
-    }
-
+    // --- クラウド読込・保存 ---
     async function fetchData() {
         const pass = document.getElementById('accessPass').value;
         const user = document.getElementById('userName').value;
-        if(!user || !pass) return;
-
-        updateStatus("照合中...");
+        updateStatus("通信中...", "#f59e0b");
         try {
             const response = await fetch(`${GAS_URL}?pass=${encodeURIComponent(pass)}`);
             const data = await response.json();
-            
             if (data.status === "error") {
-                alert("パスワードが違います。");
-                isAuthenticated = false;
+                alert("パスワードが違います");
                 updateStatus("認証失敗", "var(--danger)");
             } else {
                 projects = data.projects || [];
                 historyLogs = data.logs || [];
                 isAuthenticated = true;
-                updateStatus("同期完了", "var(--success)");
                 document.getElementById('lockMessage').style.display = "none";
                 document.querySelectorAll('.auth-only').forEach(el => el.disabled = false);
+                updateStatus("同期中", "var(--success)");
+                addLog("読込成功");
                 render();
-                updateLog();
             }
-        } catch (e) { updateStatus("通信エラー", "var(--danger)"); }
+        } catch (e) { updateStatus("エラー", "var(--danger)"); }
     }
 
     async function pushData() {
         if(!isAuthenticated) return;
         const pass = document.getElementById('accessPass').value;
-        updateStatus("保存中...");
+        updateStatus("保存中...", "#3b82f6");
         try {
-            const res = await fetch(GAS_URL, {
+            await fetch(GAS_URL, {
                 method: "POST",
                 body: JSON.stringify({ projects, logs: historyLogs, password: pass })
             });
-            const result = await res.json();
-            if (result.status === "error") {
-                alert("認証セッション切れ。再認証してください。");
-                location.reload();
-            } else {
-                updateStatus("クラウド同期済", "var(--success)");
-            }
-        } catch (e) { updateStatus("同期エラー", "var(--danger)"); }
+            updateStatus("同期完了", "var(--success)");
+        } catch (e) { updateStatus("保存失敗", "var(--danger)"); }
+    }
+
+    // --- 【NEW】ローカル保存・読込 ---
+    function exportLocal() {
+        const data = JSON.stringify({ projects, logs: historyLogs }, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `project_data_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        addLog("ローカルへ書き出し");
+    }
+
+    function importLocal(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (confirm("ローカルファイルからデータを復元しますか？現在の内容は上書きされます。")) {
+                    projects = data.projects || [];
+                    historyLogs = data.logs || [];
+                    isAuthenticated = true; // ファイル読込時は暫定的に操作許可
+                    document.querySelectorAll('.auth-only').forEach(el => el.disabled = false);
+                    document.getElementById('lockMessage').innerHTML = "【注意】ローカル読込モードです。クラウド同期にはパスワード認証が必要です。";
+                    addLog("ローカルから読込");
+                    render();
+                }
+            } catch (err) { alert("ファイル形式が正しくありません"); }
+        };
+        reader.readAsText(file);
     }
 
     function addLog(msg) {
         const now = new Date();
-        const timeStr = `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
-        const user = document.getElementById('userName').value || "不明";
-        historyLogs.unshift({ time: timeStr, user: user, msg: msg, ip: userIP, ts: now.getTime() });
-        historyLogs = historyLogs.slice(0, 100);
-        updateLog();
+        const time = `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+        historyLogs.unshift({ time, user: document.getElementById('userName').value || 'System', msg, ip: userIP });
+        historyLogs = historyLogs.slice(0, 50);
+        updateLogUI();
+    }
+    function updateLogUI() {
+        document.getElementById('logList').innerHTML = historyLogs.map(l => `<div class="log-item">${l.time} [${l.ip}] ${l.user}: ${l.msg}</div>`).join('');
     }
 
-    function updateLog() {
-        document.getElementById('logList').innerHTML = historyLogs.map(l => 
-            `<div class="log-item">${l.time} [${l.ip}] ${l.user}: ${l.msg}</div>`).join('');
-    }
-
+    // --- メイン描画（進捗%含む） ---
     function render() {
-        if(!isAuthenticated) return;
         const listEl = document.getElementById('projectList');
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-        const myTaskOnly = document.getElementById('myTaskOnly').checked;
-        const showArchived = document.getElementById('showArchived').checked;
-        const currentUser = document.getElementById('userName').value.trim();
-        const sortType = document.getElementById('sortSelect').value;
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const myOnly = document.getElementById('myTaskOnly').checked;
+        const showArc = document.getElementById('showArchived').checked;
+        const user = document.getElementById('userName').value;
         
         listEl.innerHTML = '';
-
         let filtered = projects.filter(p => {
-            const matchSearch = p.title.toLowerCase().includes(searchTerm) || p.no.toLowerCase().includes(searchTerm) || p.tasks.some(t => (t.owner||"").toLowerCase().includes(searchTerm));
-            const matchUser = !myTaskOnly || p.tasks.some(t => t.owner === currentUser);
-            return matchSearch && matchUser && (!!p.isArchived === showArchived);
-        });
-
-        // ソートロジック
-        filtered.sort((a, b) => {
-            if (sortType === 'new') return b.timestamp - a.timestamp;
-            if (sortType === 'pri-asc') return a.priority - b.priority;
-            const getMinDate = p => {
-                const dates = p.tasks.map(t => t.deadline).filter(d => d);
-                return dates.length ? dates.sort()[0] : "9999-99-99";
-            };
-            return getMinDate(a) < getMinDate(b) ? -1 : 1;
+            const match = p.title.toLowerCase().includes(search) || p.no.toLowerCase().includes(search) || p.tasks.some(t => (t.owner||"").toLowerCase().includes(search));
+            const mine = !myOnly || p.tasks.some(t => t.owner === user);
+            return match && mine && (!!p.isArchived === showArc);
         });
 
         filtered.forEach(p => {
-            const totalTasks = p.tasks.length;
-            const doneTasks = p.tasks.filter(t => t.status === '完了').length;
-            const progress = totalTasks ? Math.round((doneTasks / totalTasks) * 100) : 0;
-            const newBadge = (p.timestamp && (Date.now() - p.timestamp < 86400000)) ? `<span class="badge-new">NEW</span>` : "";
+            const total = p.tasks.length;
+            const done = p.tasks.filter(t => t.status === '完了').length;
+            const progress = total ? Math.round((done / total) * 100) : 0;
+            const isNew = p.timestamp && (Date.now() - p.timestamp < 86400000);
 
-            let rows = p.tasks.map(t => {
-                if (myTaskOnly && t.owner !== currentUser) return '';
-                return `
+            let rows = p.tasks.map(t => `
                 <tr>
-                    <td><input type="text" value="${t.content}" onchange="updateTask(${p.id}, ${t.taskId}, 'content', this.value)"></td>
+                    <td><input type="text" value="${t.content}" onchange="updateTask(${p.id}, ${t.taskId}, 'content', this.value)" style="width:95%"></td>
                     <td><input type="date" value="${t.deadline}" onchange="updateTask(${p.id}, ${t.taskId}, 'deadline', this.value)"></td>
-                    <td><input type="text" value="${t.owner || ''}" onchange="updateTask(${p.id}, ${t.taskId}, 'owner', this.value)"></td>
+                    <td><input type="text" value="${t.owner || ''}" onchange="updateTask(${p.id}, ${t.taskId}, 'owner', this.value)" style="width:80px"></td>
                     <td>
                         <select onchange="updateTask(${p.id}, ${t.taskId}, 'status', this.value)">
                             <option value="未着手" ${t.status=='未着手'?'selected':''}>未着手</option>
@@ -226,31 +231,27 @@
                         </select>
                     </td>
                     <td><button class="btn-delete" onclick="deleteTask(${p.id}, ${t.taskId})">×</button></td>
-                </tr>`;
-            }).join('');
+                </tr>`).join('');
 
             const card = document.createElement('div');
-            card.className = `project-card pri-${p.priority}`;
+            card.className = `project-card pri-${p.priority || 3}`;
             card.innerHTML = `
                 <div class="project-header" onclick="toggleProject(${p.id})">
                     <div style="flex:1; display:flex; align-items:center; gap:8px;">
                         <select onclick="event.stopPropagation()" onchange="updatePriority(${p.id}, this.value)">
-                            <option value="1" ${p.priority=="1"?'selected':''}>重・緊</option>
-                            <option value="2" ${p.priority=="2"?'selected':''}>重・非</option>
-                            <option value="4" ${p.priority=="4"?'selected':''}>通常</option>
+                            <option value="1" ${p.priority==1?'selected':''}>重・緊</option>
+                            <option value="2" ${p.priority==2?'selected':''}>重・非</option>
+                            <option value="3" ${p.priority==3?'selected':''}>通常</option>
                         </select>
-                        <span>${p.isOpen ? '▼' : '▶'} ${newBadge}<strong>【${p.no}】 ${p.title}</strong></span>
+                        <span>${p.isOpen ? '▼' : '▶'} ${isNew ? '<span class="badge-new">NEW</span>' : ''} <strong>【${p.no}】 ${p.title}</strong></span>
                         <span class="progress-text">${progress}%</span>
                     </div>
                     <button class="btn-quick-done" onclick="event.stopPropagation(); quickComplete(${p.id})">${p.isArchived?'復帰':'完了'}</button>
                     <div class="progress-outer"><div class="progress-inner" style="width:${progress}%"></div></div>
                 </div>
-                <div style="display:${p.isOpen?'block':'none'}; padding:10px; background:#fff; border:1px solid #e2e8f0; border-top:none;">
-                    <div class="table-wrapper">
-                        <table>
-                            <thead><tr><th>タスク内容</th><th>期限</th><th>担当者</th><th>ステータス</th><th></th></tr></thead>
-                            <tbody>${rows}</tbody>
-                        </table>
+                <div style="display:${p.isOpen?'block':'none'}; padding:15px; background:#fff; border:1px solid #e2e8f0; border-top:none;">
+                    <div style="overflow-x:auto;">
+                        <table><thead><tr><th>タスク内容</th><th>期限</th><th>担当者</th><th>ステータス</th><th></th></tr></thead><tbody>${rows}</tbody></table>
                     </div>
                     <button style="margin-top:10px; background:var(--success)" onclick="addTask(${p.id})">+ タスク追加</button>
                     <button class="btn-delete" style="float:right; margin-top:10px;" onclick="deleteProject(${p.id})">案件削除</button>
@@ -259,45 +260,30 @@
         });
     }
 
-    function quickComplete(pid) {
-        const p = projects.find(x => x.id === pid);
-        if (p.isArchived) { p.isArchived = false; addLog(`復帰: ${p.title}`); }
-        else {
-            const unDone = p.tasks.filter(t => t.status !== '完了');
-            if (unDone.length > 0 && !confirm("未完了タスクも全て完了にしてよろしいですか？")) return;
-            p.tasks.forEach(t => t.status = '完了'); p.isArchived = true;
-            addLog(`完了アーカイブ: ${p.title}`);
-        }
-        saveAndSync();
-    }
-
+    function updateTask(pid, tid, f, v) { projects.find(x => x.id === pid).tasks.find(tk => tk.taskId === tid)[f] = v; saveAndSync(); }
     function addProject() {
         const title = document.getElementById('newTitle').value, no = document.getElementById('newNo').value;
         if (!title || !no) return alert("案件名とNOを入力してください");
-        projects.unshift({ id: Date.now(), title, no, timestamp: Date.now(), priority: "4", isOpen: true, isArchived: false, tasks: [] });
-        addLog(`新規案件登録: ${title}`);
-        document.getElementById('newTitle').value = ''; document.getElementById('newNo').value = '';
+        projects.unshift({ id: Date.now(), title, no, timestamp: Date.now(), priority: 3, isOpen: true, tasks: [] });
+        addLog(`案件作成: ${title}`); document.getElementById('newTitle').value = ''; document.getElementById('newNo').value = '';
         saveAndSync();
     }
-
     function addTask(pid) {
-        const p = projects.find(x => x.id === pid);
-        p.tasks.push({ taskId: Date.now(), content: '', deadline: new Date().toISOString().split('T')[0], status: '未着手', owner: document.getElementById('userName').value });
-        addLog(`タスク追加: ${p.title}`); saveAndSync();
+        projects.find(x => x.id === pid).tasks.push({ taskId: Date.now(), content: '', deadline: new Date().toISOString().split('T')[0], status: '未着手', owner: document.getElementById('userName').value });
+        addLog("タスク追加"); saveAndSync();
     }
-
-    function updateTask(pid, tid, f, v) {
+    function quickComplete(pid) {
         const p = projects.find(x => x.id === pid);
-        p.tasks.find(t => t.taskId === tid)[f] = v;
-        addLog(`更新: ${p.title}`); saveAndSync();
+        if (p.isArchived) p.isArchived = false;
+        else { p.tasks.forEach(t => t.status = '完了'); p.isArchived = true; }
+        addLog(`完了操作: ${p.title}`); saveAndSync();
     }
-
-    function updatePriority(pid, v) { projects.find(x => x.id === pid).priority = v; addLog("重要度変更"); saveAndSync(); }
+    function updatePriority(pid, v) { projects.find(x => x.id === pid).priority = v; saveAndSync(); }
     function deleteTask(pid, tid) { projects.find(x => x.id === pid).tasks = projects.find(x => x.id === pid).tasks.filter(t => t.taskId !== tid); saveAndSync(); }
-    function deleteProject(id) { if(confirm("案件を完全に削除しますか？")) { projects = projects.filter(p => p.id !== id); addLog("案件削除"); saveAndSync(); } }
+    function deleteProject(id) { if(confirm("削除しますか？")) { projects = projects.filter(p => p.id !== id); addLog("案件削除"); saveAndSync(); } }
     function toggleProject(id) { projects.find(x => x.id === id).isOpen = !projects.find(x => x.id === id).isOpen; render(); }
-    function updateStatus(t, c = "#64748b") { const el = document.getElementById('syncStatus'); el.innerText = t; el.style.color = c; }
-    function saveAndSync() { render(); pushData(); }
+    function updateStatus(t, c) { const el = document.getElementById('syncStatus'); el.innerText = t; el.style.color = c; }
+    function saveAndSync() { render(); pushData(); updateLogUI(); }
 </script>
 </body>
 </html>
