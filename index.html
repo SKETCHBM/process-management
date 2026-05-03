@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>工程管理システム Total Pro v10.5</title>
+    <title>工程管理システム Total v1.1</title>
     <style>
         :root { --primary: #2563eb; --bg: #f1f5f9; --danger: #ef4444; --warning: #f59e0b; --success: #10b981; --dark: #0f172a; --border: #e2e8f0; --white: #ffffff; --text-muted: #64748b; --overdue: #fee2e2; --my-task-bg: #eff6ff; }
         * { box-sizing: border-box; }
@@ -19,6 +19,9 @@
         .input-group { flex: 1; min-width: 150px; }
         input, select, textarea { border: 1px solid var(--border); border-radius: 6px; padding: 10px; font-size: 14px; background: white; width: 100%; }
         input:focus { outline: 2px solid var(--primary); border-color: transparent; }
+
+        /* 必須入力の強調（未入力時にボーダーを出す） */
+        .required-input:invalid { border: 2px solid #fda4af; }
 
         .card-ui { background: var(--white); padding: 18px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .project-header { display: flex; justify-content: space-between; align-items: center; background: var(--white); padding: 14px; border-radius: 10px; cursor: pointer; border: 1px solid var(--border); margin-bottom: 4px; border-left-width: 14px !important; transition: transform 0.1s; position: relative; }
@@ -37,12 +40,15 @@
         .row-completed { background-color: #f8fafc; opacity: 0.6; }
         .row-my-task { background-color: var(--my-task-bg) !important; border-left: 4px solid var(--primary); }
 
-        .btn-main { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; width: auto; }
+        /* 未割当の担当者を強調 */
+        .unassigned-owner { background-color: #fff9db !important; color: #856404; font-weight: bold; border: 1px solid #ffe066; }
+
+        .btn-main { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; width: auto; transition: 0.2s; }
+        .btn-main:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(1); }
         .btn-sub { background: #f8fafc; border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .btn-danger { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
         
-        /* システムログのスタイル改善 */
-        .system-log { margin-top: 20px; background: #0f172a; color: #cbd5e1; border-radius: 10px; padding: 15px; font-family: 'Consolas', 'Monaco', monospace; font-size: 11px; height: 130px; overflow-y: auto; line-height: 1.8; border: 1px solid #334155; }
+        .system-log { margin-top: 20px; background: #0f172a; color: #cbd5e1; border-radius: 10px; padding: 15px; font-family: 'Consolas', 'Monaco', monospace; font-size: 11px; height: 130px; overflow-y: auto; line-height: 1.8; border: 1px solid #334155; scroll-behavior: smooth; }
         .log-entry { border-bottom: 1px solid #1e293b; padding: 2px 0; display: flex; justify-content: space-between; }
         .log-time { color: #64748b; margin-right: 10px; flex-shrink: 0; }
         .log-msg { flex-grow: 1; color: #e2e8f0; }
@@ -85,8 +91,8 @@
 
     <div class="card-ui">
         <div class="flex-wrap">
-            <div style="width: 110px;"><label style="font-size:10px; font-weight:bold;">案件NO</label><input type="text" id="newNo" class="auth-control" disabled placeholder="NO..."></div>
-            <div class="input-group"><label style="font-size:10px; font-weight:bold;">案件名</label><input type="text" id="newTitle" class="auth-control" disabled placeholder="案件名を入力..."></div>
+            <div style="width: 110px;"><label style="font-size:10px; font-weight:bold;">案件NO</label><input type="text" id="newNo" class="auth-control required-input" disabled placeholder="NO..." oninput="checkInputStatus()" required></div>
+            <div class="input-group"><label style="font-size:10px; font-weight:bold;">案件名</label><input type="text" id="newTitle" class="auth-control required-input" disabled placeholder="案件名を入力..." oninput="checkInputStatus()" required></div>
             <div style="width: 130px;"><label style="font-size:10px; font-weight:bold;">テンプレート</label><select id="templateSelect" class="auth-control" disabled><option value="">(空)</option><option value="domestic">国内注文</option><option value="overseas">海外注文</option><option value="manufacture">製造工程</option></select></div>
             <div style="width: 120px;"><label style="font-size:10px; font-weight:bold;">優先度</label><select id="newPriority" class="auth-control" disabled><option value="3">通常</option><option value="2">重要</option><option value="1">至急 🔥</option></select></div>
             <button onclick="addProject()" class="btn-main" style="background:var(--success);" id="btnAddProject" disabled>新規登録</button>
@@ -146,7 +152,6 @@
         } catch (e) { clientIP = "Unknown IP"; }
     }
 
-    // ログ機能の強化版
     function addLog(msg) {
         const now = new Date();
         const time = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0') + ":" + now.getSeconds().toString().padStart(2, '0');
@@ -160,6 +165,18 @@
         if(logs.length > 50) logs.pop();
         const logBox = document.getElementById('logContent');
         logBox.innerHTML = logs.join('');
+        // 最新のログへ自動スクロール
+        logBox.scrollTop = 0;
+    }
+
+    // 必須入力のリアルタイムチェック
+    function checkInputStatus() {
+        const title = document.getElementById('newTitle').value;
+        const no = document.getElementById('newNo').value;
+        const btn = document.getElementById('btnAddProject');
+        if (isAuthenticated) {
+            btn.disabled = (!title || !no);
+        }
     }
 
     function lockSystem() {
@@ -187,7 +204,7 @@
             
             isAuthenticated = true;
             document.querySelectorAll('.auth-control').forEach(el => el.disabled = false);
-            document.getElementById('btnAddProject').disabled = false;
+            checkInputStatus(); // 入力状況を確認してボタンを活性化
             document.getElementById('statusDot').className = 'status-dot status-online';
             document.getElementById('syncStatus').innerText = "ONLINE";
             document.getElementById('syncStatus').style.color = "var(--success)";
@@ -224,6 +241,7 @@
         
         addLog(`【新規】案件 #${no}「${title}」を登録しました`);
         document.getElementById('newTitle').value = ""; document.getElementById('newNo').value = "";
+        checkInputStatus();
         saveAndSync();
     }
 
@@ -290,7 +308,7 @@
                     <td>${alertBadge}<input type="text" value="${t.content}" onchange="updateTask(${p.id}, ${t.taskId}, 'content', this.value)" style="display:inline-block; width:auto; border:none; background:transparent;"></td>
                     <td><select onchange="updateTask(${p.id}, ${t.taskId}, 'taskPriority', this.value)">${[1,2,3,4,5].map(v => `<option value="${v}" ${t.taskPriority==v?'selected':''}>${'★'.repeat(6-v)}</option>`).join('')}</select></td>
                     <td><input type="date" value="${t.deadline}" ${t.isUndecided?'disabled':''} onchange="updateTask(${p.id}, ${t.taskId}, 'deadline', this.value)" style="width: 130px;"><br><label style="font-size:10px;"><input type="checkbox" ${t.isUndecided?'checked':''} onchange="updateTask(${p.id}, ${t.taskId}, 'isUndecided', this.checked)" style="width:auto;"> 期限未定</label></td>
-                    <td><select onchange="updateTask(${p.id}, ${t.taskId}, 'owner', this.value)"><option value="">未割当</option>${MEMBERS.map(m => `<option ${t.owner===m?'selected':''}>${m}</option>`).join('')}</select></td>
+                    <td><select class="${t.owner === '' ? 'unassigned-owner' : ''}" onchange="updateTask(${p.id}, ${t.taskId}, 'owner', this.value)"><option value="">未割当</option>${MEMBERS.map(m => `<option ${t.owner===m?'selected':''}>${m}</option>`).join('')}</select></td>
                     <td><select onchange="updateTask(${p.id}, ${t.taskId}, 'status', this.value)" style="font-weight:bold; background:${t.status==='完了'?'#dcfce7':(t.status==='進行中'?'#dbeafe':'#fff')}"><option ${t.status=='未着手'?'selected':''}>未着手</option><option ${t.status=='進行中'?'selected':''}>進行中</option><option ${t.status=='完了'?'selected':''}>完了</option></select></td>
                     <td style="white-space:nowrap;"><button onclick="moveTask(${p.id}, ${idx}, -1)" class="move-btn">▲</button><button onclick="moveTask(${p.id}, ${idx}, 1)" class="move-btn">▼</button><button onclick="deleteTask(${p.id}, ${t.taskId})" style="color:red; border:none; background:none;">✕</button></td>
                 </tr>`;
@@ -342,11 +360,10 @@
     function updateTask(pid, tid, f, v) { 
         const p = projects.find(x => x.id === pid); 
         const t = p.tasks.find(x => x.taskId === tid); 
-        const oldVal = t[f];
         t[f] = v; 
         p.lastUpdate = new Date().toLocaleString();
         if(f === 'status' || f === 'owner') {
-            addLog(`【更新】案件 #${p.no}：工程「${t.content}」の ${f==='status'?'状況':'担当'} を ${v} に変更`);
+            addLog(`【更新】案件 #${p.no}：工程「${t.content}」の ${f==='status'?'状況':'担当'} を ${v || '未割当'} に変更`);
         }
         saveAndSync(); 
     }
@@ -397,11 +414,15 @@
 
     function archiveProject(pid) { 
         const p = projects.find(x => x.id === pid); 
-        p.isArchived = !p.isArchived; 
-        p.isOpen = false; 
-        p.lastUpdate = new Date().toLocaleString(); 
-        addLog(`【状態】案件 #${p.no} を${p.isArchived ? '「完了済」へ移動' : '「進行中」へ復帰'}しました`);
-        saveAndSync(); 
+        const action = p.isArchived ? '「進行中」へ戻しますか？' : '案件を「完了」にしてアーカイブしますか？';
+        
+        if(confirm(action)){
+            p.isArchived = !p.isArchived; 
+            p.isOpen = false; 
+            p.lastUpdate = new Date().toLocaleString(); 
+            addLog(`【状態】案件 #${p.no} を${p.isArchived ? '「完了済」へ移動' : '「進行中」へ復帰'}しました`);
+            saveAndSync(); 
+        }
     }
 
     function toggleProject(id) { const p = projects.find(x => x.id === id); p.isOpen = !p.isOpen; render(); }
