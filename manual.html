@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Total V1 取扱説明書</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #64748b;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+            --text: #1e293b;
+        }
+        body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+        }
+        .sidebar {
+            position: fixed;
+            width: 260px;
+            height: 100vh;
+            background: #fff;
+            border-right: 1px solid #e2e8f0;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .main-content {
+            margin-left: 280px;
+            padding: 40px;
+            max-width: 900px;
+        }
+        .header {
+            border-bottom: 3px solid var(--primary);
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+        }
+        h1 { color: var(--primary); font-size: 2.5rem; margin: 0; }
+        h2 { border-left: 5px solid var(--primary); padding-left: 15px; margin-top: 50px; color: #0f172a; }
+        h3 { color: #334155; margin-top: 30px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+            color: white;
+        }
+        .badge-red { background: var(--danger); }
+        .badge-orange { background: var(--warning); }
+        .badge-blue { background: var(--primary); }
+        
+        code {
+            background: #f1f5f9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+            color: #be185d;
+        }
+        .step-list {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+        }
+        .step-list li {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 20px;
+        }
+        .step-list li::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-weight: bold;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, min-width(250px), 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h3 style="border:none">目次</h3>
+    <ul style="list-style:none; padding:0; font-size: 0.9em;">
+        <li><a href="#overview" style="text-decoration:none; color:var(--text)">■ システム概要</a></li>
+        <li><a href="#auth" style="text-decoration:none; color:var(--text)">■ ログイン・同期</a></li>
+        <li><a href="#register" style="text-decoration:none; color:var(--text)">■ 案件の登録</a></li>
+        <li><a href="#task-manage" style="text-decoration:none; color:var(--text)">■ 工程（タスク）管理</a></li>
+        <li><a href="#filter" style="text-decoration:none; color:var(--text)">■ 検索・絞り込み</a></li>
+        <li><a href="#backup" style="text-decoration:none; color:var(--text)">■ バックアップ・復元</a></li>
+    </ul>
+</div>
+
+<div class="main-content">
+    <header class="header">
+        <h1>工程管理システム Total V1</h1>
+        <p>User Manual - 社内業務効率化のための工程管理ツール</p>
+    </header>
+
+    <section id="overview">
+        <h2>1. システム概要</h2>
+        <div class="card">
+            <p><strong>Total V1</strong> は、国内・海外注文、および製造工程における複雑な進捗をチームでリアルタイムに共有するためのシステムです。Google Apps Script (GAS) をバックエンドに採用し、クラウド上でのデータ一元管理と、オフライン時でも利用可能なJSONバックアップ機能を備えています。</p>
+        </div>
+    </section>
+
+    <section id="auth">
+        <h2>2. ログイン・同期方法</h2>
+        <div class="card">
+            <h3>認証の手順</h3>
+            <ol class="step-list">
+                <li><strong>担当者の選択:</strong> プルダウンから自分の名前を選択します。</li>
+                <li><strong>パスワード入力:</strong> 指定されたアクセスパスワードを入力します。</li>
+                <li><strong>同期開始:</strong> <code>同期開始</code>ボタンを押すと「ONLINE」状態になり、最新のデータが読み込まれます。</li>
+            </ol>
+            <p><small>※認証に成功すると、3分ごとに自動的に最新の状態へ更新（オートシンク）されます。</small></p>
+        </div>
+    </section>
+
+    <section id="register">
+        <h2>3. 案件の登録</h2>
+        <div class="card">
+            <p>新しい案件（プロジェクト）を追加する際の手順です。</p>
+            <ul>
+                <li><strong>案件NO:</strong> 社内の管理番号を入力します。</li>
+                <li><strong>案件名:</strong> 識別しやすい名称を入力します。</li>
+                <li><strong>テンプレート機能:</strong> 
+                    <ul>
+                        <li><code>国内注文</code>：請求、入金、製造、発送の4工程を自動生成</li>
+                        <li><code>海外注文</code>：Iv/Pl作成、通関手続き等を含む6工程を生成</li>
+                        <li><code>製造工程</code>：原料手配から品質検査までの5工程を生成</li>
+                    </ul>
+                </li>
+                <li><strong>優先度設定:</strong> <span class="badge badge-red">至急 🔥</span> / <span class="badge badge-orange">重要</span> / <span class="badge badge-blue">通常</span> から選択します。</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="task-manage">
+        <h2>4. 工程（タスク）の詳細操作</h2>
+        <div class="card">
+            <p>各案件のヘッダーをクリックすると、詳細な工程テーブルが開きます。</p>
+            <table style="width:100%; border-collapse: collapse; margin-top:10px;">
+                <tr style="background:#f1f5f9;">
+                    <th style="padding:10px; border:1px solid #ddd;">機能</th>
+                    <th style="padding:10px; border:1px solid #ddd;">説明</th>
+                </tr>
+                <tr>
+                    <td style="padding:10px; border:1px solid #ddd;"><strong>重要度 (★)</strong></td>
+                    <td style="padding:10px; border:1px solid #ddd;">工程ごとの重要度を5段階で設定。星が多いほど重要です。</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px; border:1px solid #ddd;"><strong>期限設定</strong></td>
+                    <td style="padding:10px; border:1px solid #ddd;">カレンダーから選択。期限が切れると赤く、3日以内になると黄色く強調されます。</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px; border:1px solid #ddd;"><strong>担当者割当</strong></td>
+                    <td style="padding:10px; border:1px solid #ddd;">工程ごとに担当者を個別設定できます。</td>
+                </tr>
+                <tr>
+                    <td style="padding:10px; border:1px solid #ddd;"><strong>ステータス</strong></td>
+                    <td style="padding:10px; border:1px solid #ddd;">「未着手」「進行中」「完了」を切り替えます。完了すると行がグレーアウトします。</td>
+                </tr>
+            </table>
+        </div>
+    </section>
+
+    <section id="filter">
+        <h2>5. 便利な表示・検索機能</h2>
+        <div class="card">
+            <h3>自分宛フィルタ</h3>
+            <p><code>自分宛</code>チェックボックスをオンにすると、自分が担当者に設定されている「未完了の工程」がある案件のみが表示されます。朝のタスク確認に最適です。</p>
+            
+            <h3>案件の並べ替え</h3>
+            <ul>
+                <li><strong>優先度順:</strong> 至急案件を最上部に表示します。</li>
+                <li><strong>期限が近い順:</strong> 全工程の中で最も期限が迫っている案件から順に並べます。</li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="backup">
+        <h2>6. データのバックアップとログ</h2>
+        <div class="card">
+            <h3>JSON保存と読込</h3>
+            <p>万が一ネットワークが不安定な場合や、過去の特定の状態を保存しておきたい場合は、<code>JSON保存</code>を利用してください。保存したファイルは<code>読込</code>からいつでも復元可能です。</p>
+            
+            <h3>システムログ</h3>
+            <p>画面最下部の黒いボックスには、誰がいつどの操作（案件追加、状態変更など）を行ったかがリアルタイムで記録されます。ミスの追跡や作業履歴の確認に役立ちます。</p>
+        </div>
+    </section>
+
+    <footer style="margin-top:100px; text-align:center; color:var(--secondary); font-size:0.8em;">
+        &copy; 2026 Total Management System Project. All Rights Reserved.
+    </footer>
+</div>
+
+</body>
+</html>
