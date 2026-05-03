@@ -2,288 +2,302 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>工程管理 Cloud & Local 完全版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>工程管理システム Total Pro v9.5</title>
     <style>
-        :root { --primary: #2563eb; --bg: #f1f5f9; --danger: #ef4444; --warning: #f59e0b; --success: #10b981; --dark: #1e293b; }
-        body { font-family: "Helvetica Neue", Arial, sans-serif; background: var(--bg); padding: 10px; color: var(--dark); font-size: 14px; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        
-        /* 現場モード */
-        body.mobile-mode button { padding: 18px 24px; font-size: 17px; }
-        body.mobile-mode input, body.mobile-mode select { padding: 14px; font-size: 17px; }
-        body.mobile-mode .project-header { padding: 25px 15px; }
-
-        /* ステータス・ログ */
-        .sync-status { position: fixed; top: 10px; right: 10px; padding: 6px 14px; border-radius: 20px; font-size: 11px; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 1000; font-weight: bold; border: 1px solid #e2e8f0; }
-        .log-container { background: var(--dark); color: #f1f5f9; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 11px; }
-        .log-list { max-height: 5em; overflow-y: auto; line-height: 1.5; }
-        .log-item { border-bottom: 1px solid #334155; padding: 4px 0; font-family: monospace; }
-
-        /* 操作パネル */
-        .top-tools { background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
-        .tool-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-        .lock-notice { background: #fee2e2; border: 1px solid var(--danger); padding: 10px; border-radius: 8px; color: var(--danger); font-weight: bold; text-align: center; }
-
-        /* ビジュアル */
-        .pri-1 { border-left: 12px solid var(--danger) !important; }
-        .pri-2 { border-left: 12px solid var(--warning) !important; }
-        .pri-3 { border-left: 12px solid var(--primary) !important; }
-        .badge-new { background: var(--danger); color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; animation: blink 2s infinite; margin-right: 5px; }
-        @keyframes blink { 0%, 100% {opacity: 1;} 50% {opacity: 0.5;} }
-
-        /* 案件ヘッダー・進捗バー */
-        .project-header { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px; border-radius: 8px; cursor: pointer; border: 1px solid #e2e8f0; position: relative; margin-bottom: 8px; }
-        .progress-outer { position: absolute; bottom: 0; left: 0; height: 6px; background: #e2e8f0; width: 100%; border-radius: 0 0 8px 8px; overflow: hidden; }
-        .progress-inner { height: 100%; background: var(--success); transition: width 0.6s ease; }
-        .progress-text { font-size: 12px; font-weight: bold; color: var(--success); margin-left: 10px; }
-        
-        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; min-width: 800px; }
-        th, td { border: 1px solid #e2e8f0; padding: 10px; background: #fff; text-align: left; }
-        
-        button { cursor: pointer; background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-weight: bold; }
-        button:disabled { opacity: 0.3; cursor: not-allowed; }
-        .btn-auth { background: var(--dark); }
-        .btn-local { background: #64748b; font-size: 11px; padding: 5px 10px; }
-        .btn-delete { background: var(--danger); }
-        .btn-quick-done { background: var(--success); font-size: 12px; }
-        .switch-label { font-weight: bold; display: flex; align-items: center; gap: 5px; background: #e2e8f0; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; }
+        :root { --primary: #2563eb; --bg: #f1f5f9; --danger: #ef4444; --warning: #f59e0b; --success: #10b981; --dark: #0f172a; --border: #e2e8f0; --white: #ffffff; --text-muted: #64748b; }
+        * { box-sizing: border-box; }
+        body { font-family: "Helvetica Neue", Arial, sans-serif; background: var(--bg); padding: 10px; color: var(--dark); margin: 0; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        .flex-wrap { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+        .input-group { flex: 1; min-width: 150px; }
+        input, select, textarea { width: 100%; border: 1px solid var(--border); border-radius: 6px; padding: 10px; font-size: 14px; background: white; }
+        input:disabled, select:disabled, button:disabled { background-color: #f1f5f9 !important; cursor: not-allowed; opacity: 0.6; }
+        .header-status { position: sticky; top: 0; z-index: 1000; background: rgba(241, 245, 249, 0.95); backdrop-filter: blur(8px); padding: 12px; display: flex; align-items: center; border-bottom: 2px solid var(--border); }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background: #cbd5e1; margin-right: 8px; }
+        .status-online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .status-offline { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
+        .card-ui { background: var(--white); padding: 18px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .project-header { display: flex; justify-content: space-between; align-items: center; background: var(--white); padding: 14px; border-radius: 10px; cursor: pointer; border: 1px solid var(--border); margin-bottom: 4px; border-left-width: 14px !important; transition: all 0.2s; }
+        .pri-1 { border-left-color: var(--danger) !important; background: #fff5f5; }
+        .pri-2 { border-left-color: var(--warning) !important; }
+        .pri-3 { border-left-color: var(--primary) !important; }
+        .table-wrapper { width: 100%; overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; font-size: 13px; table-layout: fixed; }
+        th { background: #f8fafc; padding: 12px 8px; text-align: left; border-bottom: 2px solid var(--border); color: var(--text-muted); }
+        td { padding: 10px 8px; border-bottom: 1px solid var(--border); }
+        .btn-main { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; }
+        .btn-sub { background: #f8fafc; border: 1px solid var(--border); padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .btn-danger { background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .system-log { margin-top: 20px; background: #0f172a; color: #94a3b8; border-radius: 10px; padding: 10px; font-family: monospace; font-size: 11px; height: 80px; overflow-y: auto; }
+        .priority-select-mini { font-size: 11px; padding: 2px; width: auto; border: 1px solid #ccc; border-radius: 4px; }
+        .row-completed { background-color: #f8fafc; opacity: 0.7; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="syncStatus" class="sync-status">未接続</div>
-    
-    <div class="log-container">
-        <div style="font-weight:bold; margin-bottom:4px; font-size:10px; color:#94a3b8;">SYSTEM LOG / IP: <span id="ipDisplay">...</span></div>
-        <div id="logList" class="log-list">認証コードを入力してください。</div>
+    <div class="header-status">
+        <div id="statusDot" class="status-dot status-offline"></div>
+        <div id="syncStatus" style="font-weight:bold; font-size: 12px; color: var(--danger);">OFFLINE (要認証)</div>
     </div>
 
-    <div class="top-tools">
-        <div class="tool-row">
-            <span>操作者:</span><input type="text" id="userName" style="width:80px" placeholder="氏名" oninput="uiLock()">
-            <span>PASS:</span><input type="password" id="accessPass" style="width:80px" placeholder="認証" oninput="uiLock()">
-            <button class="btn-auth" id="btnAuth" onclick="fetchData()">読込・認証</button>
-            <label class="switch-label"><input type="checkbox" id="mobileModeToggle" onchange="toggleMobileMode()"> 現場モード</label>
-            <div style="margin-left:auto; display:flex; gap:5px;">
-                <button class="btn-local" onclick="exportLocal()">ローカル保存(JSON)</button>
-                <button class="btn-local" onclick="document.getElementById('fileInput').click()">ローカル読込</button>
-                <input type="file" id="fileInput" style="display:none" accept=".json" onchange="importLocal(event)">
+    <!-- 1. 認証 & 管理機能 -->
+    <div class="card-ui" style="border-left: 6px solid var(--dark);">
+        <div class="flex-wrap">
+            <div style="width: 180px;"><label style="font-size:10px; font-weight:800;">担当者</label><select id="userName" onchange="lockSystem()"></select></div>
+            <div style="width: 140px;"><label style="font-size:10px; font-weight:800;">パスワード</label><input type="password" id="accessPass" placeholder="****"></div>
+            <button onclick="fetchData()" class="btn-main" id="btnSync">同期開始</button>
+            <button id="adminRollback" onclick="rollbackSystem()" class="btn-danger" style="display:none;">⚠️ 以前の状態に戻す</button>
+            <div style="margin-left:auto; display:flex; gap:8px;">
+                <button onclick="exportLocal()" class="btn-sub">JSON保存</button>
+                <button onclick="document.getElementById('importFile').click()" class="btn-sub">読込</button>
+                <input type="file" id="importFile" style="display:none" onchange="importLocal(event)">
             </div>
         </div>
-        
-        <div id="lockMessage" class="lock-notice">認証が完了するまでクラウド機能はロックされています</div>
-        
-        <div class="tool-row">
-            <input type="text" id="searchInput" style="flex:2" placeholder="検索（案件・NO・担当）" oninput="render()" disabled class="auth-only">
-            <label><input type="checkbox" id="myTaskOnly" onchange="render()" disabled class="auth-only"> 自分宛</label>
-            <label><input type="checkbox" id="showArchived" onchange="render()" disabled class="auth-only"> 完了表示</label>
-            <select id="sortSelect" onchange="render()" disabled class="auth-only">
-                <option value="date-asc">期限順</option>
-                <option value="new">新着順</option>
-            </select>
+    </div>
+
+    <!-- 2. 新規登録 -->
+    <div class="card-ui">
+        <div class="flex-wrap">
+            <div style="width: 110px;"><label style="font-size:10px; font-weight:bold;">案件NO</label><input type="text" id="newNo" class="auth-control" disabled placeholder="NO..."></div>
+            <div class="input-group"><label style="font-size:10px; font-weight:bold;">案件名</label><input type="text" id="newTitle" class="auth-control" disabled placeholder="案件名を入力..."></div>
+            <div style="width: 130px;"><label style="font-size:10px; font-weight:bold;">テンプレート</label><select id="templateSelect" class="auth-control" disabled><option value="">(空)</option><option value="domestic">国内注文</option><option value="overseas">海外注文</option><option value="manufacture">製造工程</option></select></div>
+            <div style="width: 120px;"><label style="font-size:10px; font-weight:bold;">優先度</label><select id="newPriority" class="auth-control" disabled><option value="3">通常</option><option value="2">重要</option><option value="1">至急 🔥</option></select></div>
+            <button onclick="addProject()" class="btn-main" style="background:var(--success);" id="btnAddProject" disabled>新規登録</button>
+        </div>
+    </div>
+
+    <!-- 3. フィルタ・並べ替え -->
+    <div class="card-ui" style="background:#f8fafc;">
+        <div class="flex-wrap">
+            <div class="input-group"><input type="text" id="searchInput" oninput="render()" placeholder="🔍 検索..." class="auth-control" disabled></div>
+            <div style="width: 150px;"><select id="creatorFilter" onchange="render()" class="auth-control" disabled><option value="">作成者: 全員</option></select></div>
+            <div style="width: 180px;">
+                <label style="font-size:10px; font-weight:bold; color:var(--text-muted);">並べ替え</label>
+                <select id="sortSelect" onchange="render()" class="auth-control" disabled>
+                    <option value="reg-new">新着順</option>
+                    <option value="reg-old">古い順</option>
+                    <option value="deadline-asc">期限順</option>
+                    <option value="pri-asc" selected>優先度順</option>
+                </select>
+            </div>
+            <div style="display:flex; gap:15px; align-items:center; font-size:13px;">
+                <label><input type="checkbox" id="myTaskOnly" onchange="render()" class="auth-control" disabled> 自分宛</label>
+                <label><input type="checkbox" id="showArchived" onchange="render()" class="auth-control" disabled> 完了済表示</label>
+            </div>
         </div>
     </div>
 
     <div id="projectList"></div>
-
-    <div style="background:#fff; padding:15px; border-radius:12px; margin-top:20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-        <h3 style="margin-top:0; font-size:14px;">新規案件の登録</h3>
-        <div class="tool-row">
-            <input type="text" id="newTitle" placeholder="案件名・製品名" style="flex:2" disabled class="auth-only">
-            <input type="text" id="newNo" placeholder="管理NO" style="flex:1" disabled class="auth-only">
-            <button id="addProjBtn" onclick="addProject()" disabled class="auth-only">案件作成</button>
-        </div>
-    </div>
+    <div id="logContent" class="system-log"></div>
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzetXv_6M3sAiPUz6qORvB93NhaX7sdJc8jM3OQHWtWYCld6UmqMyi1Mi4_w4CaWcGK/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbzbGnsKdtAFuHiWVRloZ-KRuDi7PMIzVsE0dHWM-t65uTCE6vaFQJi3IIDWD26c4lSIOQ/exec";
+    const MEMBERS = ["社長", "高堰", "南（早）", "四ノ宮", "川端", "吉岡", "南（優）", "落合", "森", "山岸", "島田（和）"];
+    const TEMPLATES = { domestic: ["請求処理", "入金確認", "製造・充填", "発送手配"], overseas: ["書類作成(Iv/Pl)", "請求処理", "入金確認", "製造・充填", "発送手配", "通関手続き"], manufacture: ["原料手配", "調合・攪拌", "充填作業", "品質検査", "出荷"] };
+
     let projects = [];
-    let historyLogs = [];
-    let userIP = "Unknown";
+    let logs = [];
     let isAuthenticated = false;
 
-    fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => {
-        userIP = d.ip; document.getElementById('ipDisplay').innerText = d.ip;
-    }).catch(()=>{});
+    window.onload = () => {
+        const uSel = document.getElementById('userName');
+        const cSel = document.getElementById('creatorFilter');
+        const ops = MEMBERS.map(m => `<option>${m}</option>`).join('');
+        uSel.innerHTML = '<option value="">選択してください</option>' + ops + '<option value="代理">👑 代理（管理者）</option>';
+        cSel.innerHTML = '<option value="">作成者: 全員</option>' + ops;
+    };
 
-    function toggleMobileMode() { document.body.classList.toggle('mobile-mode', document.getElementById('mobileModeToggle').checked); }
-    function uiLock() {
-        const u = document.getElementById('userName').value.trim();
-        const p = document.getElementById('accessPass').value.trim();
-        document.getElementById('btnAuth').disabled = (u === "" || p === "");
+    function lockSystem() {
+        isAuthenticated = false;
+        document.querySelectorAll('.auth-control').forEach(el => el.disabled = true);
+        document.getElementById('btnAddProject').disabled = true;
+        document.getElementById('statusDot').className = 'status-dot status-offline';
+        document.getElementById('syncStatus').innerText = "OFFLINE (要認証)";
+        document.getElementById('adminRollback').style.display = 'none';
+        render();
     }
 
-    // --- クラウド読込・保存 ---
     async function fetchData() {
         const pass = document.getElementById('accessPass').value;
         const user = document.getElementById('userName').value;
-        updateStatus("通信中...", "#f59e0b");
-        try {
-            const response = await fetch(`${GAS_URL}?pass=${encodeURIComponent(pass)}`);
-            const data = await response.json();
-            if (data.status === "error") {
-                alert("パスワードが違います");
-                updateStatus("認証失敗", "var(--danger)");
-            } else {
-                projects = data.projects || [];
-                historyLogs = data.logs || [];
-                isAuthenticated = true;
-                document.getElementById('lockMessage').style.display = "none";
-                document.querySelectorAll('.auth-only').forEach(el => el.disabled = false);
-                updateStatus("同期中", "var(--success)");
-                addLog("読込成功");
-                render();
-            }
-        } catch (e) { updateStatus("エラー", "var(--danger)"); }
-    }
-
-    async function pushData() {
-        if(!isAuthenticated) return;
-        const pass = document.getElementById('accessPass').value;
-        updateStatus("保存中...", "#3b82f6");
-        try {
-            await fetch(GAS_URL, {
-                method: "POST",
-                body: JSON.stringify({ projects, logs: historyLogs, password: pass })
-            });
-            updateStatus("同期完了", "var(--success)");
-        } catch (e) { updateStatus("保存失敗", "var(--danger)"); }
-    }
-
-    // --- 【NEW】ローカル保存・読込 ---
-    function exportLocal() {
-        const data = JSON.stringify({ projects, logs: historyLogs }, null, 2);
-        const blob = new Blob([data], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `project_data_${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
-        addLog("ローカルへ書き出し");
-    }
-
-    function importLocal(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const data = JSON.parse(e.target.result);
-                if (confirm("ローカルファイルからデータを復元しますか？現在の内容は上書きされます。")) {
-                    projects = data.projects || [];
-                    historyLogs = data.logs || [];
-                    isAuthenticated = true; // ファイル読込時は暫定的に操作許可
-                    document.querySelectorAll('.auth-only').forEach(el => el.disabled = false);
-                    document.getElementById('lockMessage').innerHTML = "【注意】ローカル読込モードです。クラウド同期にはパスワード認証が必要です。";
-                    addLog("ローカルから読込");
-                    render();
-                }
-            } catch (err) { alert("ファイル形式が正しくありません"); }
-        };
-        reader.readAsText(file);
-    }
-
-    function addLog(msg) {
-        const now = new Date();
-        const time = `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
-        historyLogs.unshift({ time, user: document.getElementById('userName').value || 'System', msg, ip: userIP });
-        historyLogs = historyLogs.slice(0, 50);
-        updateLogUI();
-    }
-    function updateLogUI() {
-        document.getElementById('logList').innerHTML = historyLogs.map(l => `<div class="log-item">${l.time} [${l.ip}] ${l.user}: ${l.msg}</div>`).join('');
-    }
-
-    // --- メイン描画（進捗%含む） ---
-    function render() {
-        const listEl = document.getElementById('projectList');
-        const search = document.getElementById('searchInput').value.toLowerCase();
-        const myOnly = document.getElementById('myTaskOnly').checked;
-        const showArc = document.getElementById('showArchived').checked;
-        const user = document.getElementById('userName').value;
+        if(!user || !pass) return alert("担当者とパスワードを入力してください");
         
-        listEl.innerHTML = '';
+        const btn = document.getElementById('btnSync');
+        btn.innerText = "認証中..."; btn.disabled = true;
+
+        try {
+            const res = await fetch(`${GAS_URL}?pass=${encodeURIComponent(pass)}&user=${encodeURIComponent(user)}`);
+            const data = await res.json();
+            if (data.status === "error") throw new Error();
+            
+            projects = data.projects || [];
+            isAuthenticated = true;
+            document.querySelectorAll('.auth-control').forEach(el => el.disabled = false);
+            document.getElementById('btnAddProject').disabled = false;
+            document.getElementById('statusDot').className = 'status-dot status-online';
+            document.getElementById('syncStatus').innerText = "ONLINE";
+            document.getElementById('syncStatus').style.color = "var(--success)";
+            
+            // 管理者機能表示
+            if(user === "代理") document.getElementById('adminRollback').style.display = 'inline-block';
+            
+            addLog(`${user} 認証成功`);
+            render();
+        } catch (e) { 
+            alert("認証失敗。パスワードが違うか、通信エラーです。"); lockSystem();
+        } finally {
+            btn.innerText = "同期開始"; btn.disabled = false;
+        }
+    }
+
+    function addProject() {
+        if(!isAuthenticated) return alert("認証が切れています。再度同期してください。");
+        const title = document.getElementById('newTitle').value;
+        const no = document.getElementById('newNo').value;
+        const tempKey = document.getElementById('templateSelect').value;
+        const user = document.getElementById('userName').value;
+        const priority = parseInt(document.getElementById('newPriority').value);
+
+        if (!title || !no) return alert("案件NOと案件名を入力してください");
+        
+        const templateTasks = (TEMPLATES[tempKey] || []).map((name, i) => ({
+            taskId: Date.now() + i, content: name, deadline: '', isUndecided: true, status: '未着手', owner: '', taskPriority: 3
+        }));
+
+        const newProj = {
+            id: Date.now(), no, title, priority: priority,
+            tasks: templateTasks, creator: user, regDate: new Date().toLocaleDateString(), 
+            timestamp: Date.now(), isArchived: false, isOpen: true, notes: ""
+        };
+
+        projects.unshift(newProj);
+        document.getElementById('newTitle').value = ""; 
+        document.getElementById('newNo').value = "";
+        
+        saveAndSync();
+        addLog(`案件登録: ${title}`);
+    }
+
+    function render() {
+        const user = document.getElementById('userName').value;
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const creatorFilter = document.getElementById('creatorFilter').value;
+        const sort = document.getElementById('sortSelect').value;
+        const showArc = document.getElementById('showArchived').checked;
+        const myOnly = document.getElementById('myTaskOnly').checked;
+
         let filtered = projects.filter(p => {
-            const match = p.title.toLowerCase().includes(search) || p.no.toLowerCase().includes(search) || p.tasks.some(t => (t.owner||"").toLowerCase().includes(search));
-            const mine = !myOnly || p.tasks.some(t => t.owner === user);
-            return match && mine && (!!p.isArchived === showArc);
+            const matchesSearch = p.title.toLowerCase().includes(search) || p.no.toLowerCase().includes(search);
+            const matchesCreator = creatorFilter === "" || p.creator === creatorFilter;
+            const matchesArchive = !!p.isArchived === showArc;
+            const hasMyTask = p.tasks.some(t => t.owner === user && t.status !== '完了');
+            return matchesSearch && matchesCreator && matchesArchive && (!myOnly || hasMyTask);
         });
 
-        filtered.forEach(p => {
-            const total = p.tasks.length;
-            const done = p.tasks.filter(t => t.status === '完了').length;
-            const progress = total ? Math.round((done / total) * 100) : 0;
-            const isNew = p.timestamp && (Date.now() - p.timestamp < 86400000);
+        filtered.sort((a, b) => {
+            if (sort === 'reg-new') return b.timestamp - a.timestamp;
+            if (sort === 'reg-old') return a.timestamp - b.timestamp;
+            if (sort === 'pri-asc') return a.priority - b.priority || b.timestamp - a.timestamp;
+            if (sort === 'deadline-asc') {
+                const getD = (p) => {
+                    const active = p.tasks.filter(t => t.deadline && !t.isUndecided && t.status !== '完了').map(t => new Date(t.deadline).getTime());
+                    return active.length ? Math.min(...active) : Infinity;
+                };
+                return getD(a) - getD(b) || a.priority - b.priority;
+            }
+            return 0;
+        });
 
-            let rows = p.tasks.map(t => `
-                <tr>
-                    <td><input type="text" value="${t.content}" onchange="updateTask(${p.id}, ${t.taskId}, 'content', this.value)" style="width:95%"></td>
-                    <td><input type="date" value="${t.deadline}" onchange="updateTask(${p.id}, ${t.taskId}, 'deadline', this.value)"></td>
-                    <td><input type="text" value="${t.owner || ''}" onchange="updateTask(${p.id}, ${t.taskId}, 'owner', this.value)" style="width:80px"></td>
+        const listEl = document.getElementById('projectList');
+        listEl.innerHTML = '';
+
+        filtered.forEach(p => {
+            const done = p.tasks.filter(t => t.status === '完了').length;
+            const prog = p.tasks.length ? Math.round((done / p.tasks.length) * 100) : 0;
+            const rows = p.tasks.map(t => `
+                <tr class="${t.status === '完了' ? 'row-completed' : ''}">
+                    <td><input type="text" value="${t.content}" onchange="updateTask(${p.id}, ${t.taskId}, 'content', this.value)"></td>
+                    <td><select onchange="updateTask(${p.id}, ${t.taskId}, 'taskPriority', this.value)">
+                        ${[1,2,3,4,5].map(v => `<option value="${v}" ${t.taskPriority==v?'selected':''}>${'★'.repeat(6-v)}</option>`).join('')}
+                    </select></td>
                     <td>
-                        <select onchange="updateTask(${p.id}, ${t.taskId}, 'status', this.value)">
-                            <option value="未着手" ${t.status=='未着手'?'selected':''}>未着手</option>
-                            <option value="進行中" ${t.status=='進行中'?'selected':''}>進行中</option>
-                            <option value="完了" ${t.status=='完了'?'selected':''}>完了</option>
-                        </select>
+                        <input type="date" value="${t.deadline}" ${t.isUndecided?'disabled':''} onchange="updateTask(${p.id}, ${t.taskId}, 'deadline', this.value)">
+                        <label style="font-size:10px;"><input type="checkbox" ${t.isUndecided?'checked':''} onchange="updateTask(${p.id}, ${t.taskId}, 'isUndecided', this.checked)"> 未定</label>
                     </td>
-                    <td><button class="btn-delete" onclick="deleteTask(${p.id}, ${t.taskId})">×</button></td>
+                    <td><select onchange="updateTask(${p.id}, ${t.taskId}, 'owner', this.value)">
+                        <option value="">未割当</option>${MEMBERS.map(m => `<option ${t.owner===m?'selected':''}>${m}</option>`).join('')}
+                    </select></td>
+                    <td><select onchange="updateTask(${p.id}, ${t.taskId}, 'status', this.value)" style="font-weight:bold; background:${t.status==='完了'?'#dcfce7':(t.status==='進行中'?'#dbeafe':'#fff')}">
+                        <option ${t.status=='未着手'?'selected':''}>未着手</option><option ${t.status=='進行中'?'selected':''}>進行中</option><option ${t.status=='完了'?'selected':''}>完了</option>
+                    </select></td>
+                    <td><button onclick="deleteTask(${p.id}, ${t.taskId})" style="color:red; background:none; border:none;">✕</button></td>
                 </tr>`).join('');
 
             const card = document.createElement('div');
-            card.className = `project-card pri-${p.priority || 3}`;
             card.innerHTML = `
-                <div class="project-header" onclick="toggleProject(${p.id})">
-                    <div style="flex:1; display:flex; align-items:center; gap:8px;">
-                        <select onclick="event.stopPropagation()" onchange="updatePriority(${p.id}, this.value)">
-                            <option value="1" ${p.priority==1?'selected':''}>重・緊</option>
-                            <option value="2" ${p.priority==2?'selected':''}>重・非</option>
+                <div class="project-header pri-${p.priority}" onclick="toggleProject(${p.id})">
+                    <div style="flex:1;">
+                        <span style="font-size:10px; color:gray;">#${p.no} / 作成:${p.creator}</span>
+                        <select class="priority-select-mini" onclick="event.stopPropagation()" onchange="updateProjInfo(${p.id}, 'priority', this.value)">
                             <option value="3" ${p.priority==3?'selected':''}>通常</option>
+                            <option value="2" ${p.priority==2?'selected':''}>重要</option>
+                            <option value="1" ${p.priority==1?'selected':''}>至急 🔥</option>
                         </select>
-                        <span>${p.isOpen ? '▼' : '▶'} ${isNew ? '<span class="badge-new">NEW</span>' : ''} <strong>【${p.no}】 ${p.title}</strong></span>
-                        <span class="progress-text">${progress}%</span>
+                        <br><span style="font-weight:800;">${p.priority==1?'🔥 ':''}${p.title}</span>
                     </div>
-                    <button class="btn-quick-done" onclick="event.stopPropagation(); quickComplete(${p.id})">${p.isArchived?'復帰':'完了'}</button>
-                    <div class="progress-outer"><div class="progress-inner" style="width:${progress}%"></div></div>
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="background:#e2e8f0; height:12px; width:80px; border-radius:6px; overflow:hidden;"><div style="background:var(--success); width:${prog}%; height:100%;"></div></div>
+                        <span style="font-size:12px; font-weight:bold;">${prog}%</span>
+                        <button onclick="event.stopPropagation(); archiveProject(${p.id})" class="btn-sub">${p.isArchived?'戻す':'完了'}</button>
+                    </div>
                 </div>
-                <div style="display:${p.isOpen?'block':'none'}; padding:15px; background:#fff; border:1px solid #e2e8f0; border-top:none;">
-                    <div style="overflow-x:auto;">
-                        <table><thead><tr><th>タスク内容</th><th>期限</th><th>担当者</th><th>ステータス</th><th></th></tr></thead><tbody>${rows}</tbody></table>
+                <div style="display:${p.isOpen?'block':'none'}; background:white; padding:15px; border:1px solid #ddd; border-top:none; border-radius:0 0 10px 10px; margin-bottom:10px;">
+                    <div class="table-wrapper"><table><thead><tr><th>工程名</th><th style="width:90px;">重要度</th><th style="width:180px;">期限</th><th style="width:120px;">担当</th><th style="width:110px;">状況</th><th style="width:40px;"></th></tr></thead><tbody>${rows}</tbody></table></div>
+                    <div style="margin-top:10px; display:flex; gap:10px;">
+                        <button onclick="addTask(${p.id})" class="btn-sub" style="background:#eef2ff; color:blue;">+ 工程追加</button>
+                        <textarea placeholder="備考..." style="flex:1; height:40px;" onchange="updateProjInfo(${p.id}, 'notes', this.value)">${p.notes||''}</textarea>
+                        <button onclick="deleteProject(${p.id})" style="color:red; font-size:11px; background:none; border:none;">案件削除</button>
                     </div>
-                    <button style="margin-top:10px; background:var(--success)" onclick="addTask(${p.id})">+ タスク追加</button>
-                    <button class="btn-delete" style="float:right; margin-top:10px;" onclick="deleteProject(${p.id})">案件削除</button>
                 </div>`;
             listEl.appendChild(card);
         });
     }
 
-    function updateTask(pid, tid, f, v) { projects.find(x => x.id === pid).tasks.find(tk => tk.taskId === tid)[f] = v; saveAndSync(); }
-    function addProject() {
-        const title = document.getElementById('newTitle').value, no = document.getElementById('newNo').value;
-        if (!title || !no) return alert("案件名とNOを入力してください");
-        projects.unshift({ id: Date.now(), title, no, timestamp: Date.now(), priority: 3, isOpen: true, tasks: [] });
-        addLog(`案件作成: ${title}`); document.getElementById('newTitle').value = ''; document.getElementById('newNo').value = '';
-        saveAndSync();
-    }
-    function addTask(pid) {
-        projects.find(x => x.id === pid).tasks.push({ taskId: Date.now(), content: '', deadline: new Date().toISOString().split('T')[0], status: '未着手', owner: document.getElementById('userName').value });
-        addLog("タスク追加"); saveAndSync();
-    }
-    function quickComplete(pid) {
+    // データ操作
+    function updateTask(pid, tid, f, v) { projects.find(x => x.id === pid).tasks.find(x => x.taskId === tid)[f] = v; saveAndSync(); }
+    function updateProjInfo(pid, f, v) { 
         const p = projects.find(x => x.id === pid);
-        if (p.isArchived) p.isArchived = false;
-        else { p.tasks.forEach(t => t.status = '完了'); p.isArchived = true; }
-        addLog(`完了操作: ${p.title}`); saveAndSync();
+        p[f] = (f === 'priority') ? parseInt(v) : v; 
+        saveAndSync(); 
     }
-    function updatePriority(pid, v) { projects.find(x => x.id === pid).priority = v; saveAndSync(); }
-    function deleteTask(pid, tid) { projects.find(x => x.id === pid).tasks = projects.find(x => x.id === pid).tasks.filter(t => t.taskId !== tid); saveAndSync(); }
-    function deleteProject(id) { if(confirm("削除しますか？")) { projects = projects.filter(p => p.id !== id); addLog("案件削除"); saveAndSync(); } }
+    function addTask(pid) { projects.find(x => x.id === pid).tasks.push({ taskId: Date.now(), content: '新工程', deadline: '', isUndecided: true, status: '未着手', owner: '', taskPriority: 3 }); saveAndSync(); }
+    function deleteTask(pid, tid) { if(confirm("削除しますか？")) { const p = projects.find(x => x.id === pid); p.tasks = p.tasks.filter(t => t.taskId !== tid); saveAndSync(); } }
+    function deleteProject(pid) { if(confirm("案件を削除します。")) { projects = projects.filter(x => x.id !== pid); saveAndSync(); } }
+    function archiveProject(pid) { const p = projects.find(x => x.id === pid); p.isArchived = !p.isArchived; saveAndSync(); }
     function toggleProject(id) { projects.find(x => x.id === id).isOpen = !projects.find(x => x.id === id).isOpen; render(); }
-    function updateStatus(t, c) { const el = document.getElementById('syncStatus'); el.innerText = t; el.style.color = c; }
-    function saveAndSync() { render(); pushData(); updateLogUI(); }
+
+    function saveAndSync() {
+        if(!isAuthenticated) return;
+        render(); 
+        const pass = document.getElementById('accessPass').value;
+        const user = document.getElementById('userName').value;
+        fetch(GAS_URL, { method: "POST", body: JSON.stringify({ projects, password: pass, user: user }) })
+        .then(() => addLog("クラウド保存成功"))
+        .catch(() => addLog("保存失敗：オフラインの可能性があります"));
+    }
+
+    async function rollbackSystem() {
+        if(!confirm("前回の保存データに戻しますか？")) return;
+        addLog("ロールバック試行中...");
+        await fetchData(); // 最新のGASデータを再取得
+    }
+
+    function addLog(msg) { logs.unshift({ time: new Date().toLocaleTimeString(), msg }); if(logs.length > 10) logs.pop(); document.getElementById('logContent').innerHTML = logs.map(l => `<div>> ${l.time} : ${l.msg}</div>`).join(''); }
+    function exportLocal() { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify({ projects })], { type: 'application/json' })); a.download = `Backup_${new Date().toISOString().slice(0,10)}.json`; a.click(); }
+    function importLocal(e) { const r = new FileReader(); r.onload = (ev) => { try { projects = JSON.parse(ev.target.result).projects; render(); addLog("インポート完了"); } catch(e) { alert("形式エラー"); } }; r.readAsText(e.target.files[0]); }
 </script>
 </body>
 </html>
