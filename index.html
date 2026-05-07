@@ -159,7 +159,8 @@
             <div class="log-entry">
                 <span class="log-time">[${time}]</span>
                 <span class="log-msg">${msg}</span>
-                <span class="log-ip">${clientIP}</span>
+                <!-- IPアドレス表示を一時的に非表示 -->
+                <!-- <span class="log-ip">${clientIP}</span> -->
             </div>`;
         logs.unshift(logHtml);
         if(logs.length > 50) logs.pop();
